@@ -3,7 +3,7 @@ import { getSupabase } from "@/lib/supabase"
 import AnimeGrid from "@/components/anime-grid"
 import FilterSidebar from "@/components/filter-sidebar"
 
-interface BrowsePageProps {
+type Props = {
   searchParams: {
     sort?: string
     status?: string
@@ -25,7 +25,7 @@ async function getGenres() {
   return data
 }
 
-async function getAnime(params: BrowsePageProps["searchParams"]) {
+async function getAnime(params: Props["searchParams"]) {
   const supabase = getSupabase()
   let query = supabase.from("anime").select("*")
 
@@ -75,7 +75,7 @@ async function getAnime(params: BrowsePageProps["searchParams"]) {
   return data
 }
 
-async function getAnimeCount(params: BrowsePageProps["searchParams"]) {
+async function getAnimeCount(params: Props["searchParams"]) {
   const supabase = getSupabase()
   let query = supabase.from("anime").select("id", { count: "exact" })
 
@@ -104,7 +104,7 @@ async function getAnimeCount(params: BrowsePageProps["searchParams"]) {
   return count || 0
 }
 
-export default async function BrowsePage({ searchParams }: BrowsePageProps) {
+export default async function BrowsePage({ searchParams }: Props) {
   console.log("Browse page loaded with params:", searchParams)
 
   const genres = await getGenres()
@@ -133,4 +133,5 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     </div>
   )
 }
+
 
