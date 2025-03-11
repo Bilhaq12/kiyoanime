@@ -129,7 +129,9 @@ async function getVideoServers(episodeId: number) {
     return []
   }
 
-  return data
+  // Pastikan format data sesuai dengan interface VideoServer
+  return data.map(server => ({
+    ...server,
+    quality: Array.isArray(server.quality) ? server.quality[0] : server.quality
+  }))
 }
-
-
