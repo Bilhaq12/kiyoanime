@@ -3,14 +3,34 @@ import { getSupabase } from "@/lib/supabase"
 import AnimeGrid from "@/components/anime-grid"
 import FilterSidebar from "@/components/filter-sidebar"
 
-type Props = {
-  searchParams: {
-    sort?: string
-    status?: string
-    type?: string
-    genre?: string
-    page?: string
-  }
+export default async function BrowsePage({ searchParams }: any) {
+  console.log("Browse page loaded with params:", searchParams)
+
+  const genres = await getGenres()
+  const anime = await getAnime(searchParams)
+  const totalCount = await getAnimeCount(searchParams)
+
+  const currentPage = searchParams.page ? Number.parseInt(searchParams.page) : 1
+  const pageSize = 20
+  const totalPages = Math.ceil(totalCount / pageSize)
+
+  return (
+    <div className="pt-20 pb-10">
+      <div className="container mx-auto px-4">
+        <h1 className="text-2xl font-bold mb-6">Browse Anime</h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6">
+          <Suspense fallback={<div className="h-96 bg-secondary/20 animate-pulse rounded-lg" />}>
+            <FilterSidebar genres={genres} currentFilters={searchParams} />
+          </Suspense>
+
+          <Suspense fallback={<div className="h-96 bg-secondary/20 animate-pulse rounded-lg" />}>
+            <AnimeGrid anime={anime} currentPage={currentPage} totalPages={totalPages} searchParams={searchParams} />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 async function getGenres() {
@@ -25,7 +45,7 @@ async function getGenres() {
   return data
 }
 
-async function getAnime(params: Props["searchParams"]) {
+async function getAnime(params: any) {
   const supabase = getSupabase()
   let query = supabase.from("anime").select("*")
 
@@ -75,7 +95,7 @@ async function getAnime(params: Props["searchParams"]) {
   return data
 }
 
-async function getAnimeCount(params: Props["searchParams"]) {
+async function getAnimeCount(params: any) {
   const supabase = getSupabase()
   let query = supabase.from("anime").select("id", { count: "exact" })
 
@@ -103,35 +123,4 @@ async function getAnimeCount(params: Props["searchParams"]) {
 
   return count || 0
 }
-
-export default async function BrowsePage({ searchParams }: Props) {
-  console.log("Browse page loaded with params:", searchParams)
-
-  const genres = await getGenres()
-  const anime = await getAnime(searchParams)
-  const totalCount = await getAnimeCount(searchParams)
-
-  const currentPage = searchParams.page ? Number.parseInt(searchParams.page) : 1
-  const pageSize = 20
-  const totalPages = Math.ceil(totalCount / pageSize)
-
-  return (
-    <div className="pt-20 pb-10">
-      <div className="container mx-auto px-4">
-        <h1 className="text-2xl font-bold mb-6">Browse Anime</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-6">
-          <Suspense fallback={<div className="h-96 bg-secondary/20 animate-pulse rounded-lg" />}>
-            <FilterSidebar genres={genres} currentFilters={searchParams} />
-          </Suspense>
-
-          <Suspense fallback={<div className="h-96 bg-secondary/20 animate-pulse rounded-lg" />}>
-            <AnimeGrid anime={anime} currentPage={currentPage} totalPages={totalPages} searchParams={searchParams} />
-          </Suspense>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 
