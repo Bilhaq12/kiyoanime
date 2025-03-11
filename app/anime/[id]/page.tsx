@@ -12,6 +12,7 @@ interface AnimePageProps {
   params: {
     id: string
   }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 async function getAnime(id: string) {
