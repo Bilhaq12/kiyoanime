@@ -8,11 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate, getAnimeStatusColor } from "@/lib/utils"
 import AnimeCarousel from "@/components/anime-carousel"
 
-interface AnimePageProps {
-  params: {
-    id: string
-  }
-  searchParams?: { [key: string]: string | string[] | undefined }
+// Remove the custom interface and use the correct Next.js types
+type Props = {
+  params: { id: string }
 }
 
 async function getAnime(id: string) {
@@ -85,7 +83,7 @@ async function getSimilarAnime(animeId: string) {
   return data
 }
 
-export default async function AnimePage({ params }: AnimePageProps) {
+export default async function AnimePage({ params }: Props) {
   const anime = await getAnime(params.id)
 
   if (!anime) {
