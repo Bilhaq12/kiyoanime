@@ -1,22 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  SkipForward,
-  SkipBack,
-  Settings,
-  Forward,
-  Rewind,
-  PictureInPicture,
-  ExternalLink,
-  Server,
-  Check,
-} from "lucide-react"
+import { Play, Pause, Volume2, VolumeX, Maximize, SkipForward, SkipBack, Settings, Forward, Rewind, PictureInPicture, ExternalLink, Server, Check } from 'lucide-react'
 import type { Tables } from "@/types/supabase"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -32,15 +17,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface VideoServer {
-  id: number
-  server_name: string
-  url: string
-  is_default: boolean
-  server_id: string | null
+  id: number;
+  server_name: string;
+  url: string;
+  is_default: boolean;
+  server_id: string | null;
   quality: {
-    id: number
-    name: string
-  }
+    id: number;
+    name: string;
+  };
 }
 
 interface VideoPlayerProps {
@@ -920,4 +905,3 @@ export default function VideoPlayer({
     </div>
   )
 }
-
