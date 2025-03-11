@@ -5,70 +5,16 @@ import EpisodeList from "@/components/episode-list"
 import AnimeInfo from "@/components/anime-info"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-type Props = {
-  params: { id: string }
-  searchParams: { ep?: string; server?: string; quality?: string }
-}
+export default async function WatchPage({ params, searchParams }: any) {
+  const id = params.id
 
-async function getAnime(id: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase.from("anime").select("*").eq("id", id).single()
-
-  if (error) {
-    console.error("Error fetching anime:", error)
-    return null
-  }
-
-  return data
-}
-
-async function getEpisodes(animeId: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from("episode")
-    .select("*")
-    .eq("anime_id", animeId)
-    .order("episode_number", { ascending: true })
-
-  if (error) {
-    console.error("Error fetching episodes:", error)
-    return []
-  }
-
-  return data
-}
-
-async function getVideoServers(episodeId: number) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from("video_server")
-    .select(`
-      id,
-      server_name,
-      url,
-      is_default,
-      server_id,
-      quality:quality_id(id, name)
-    `)
-    .eq("episode_id", episodeId)
-    .order("is_default", { ascending: false })
-
-  if (error) {
-    console.error("Error fetching video servers:", error)
-    return []
-  }
-
-  return data
-}
-
-export default async function WatchPage({ params, searchParams }: Props) {
-  const anime = await getAnime(params.id)
+  const anime = await getAnime(id)
 
   if (!anime) {
     notFound()
   }
 
-  const episodes = await getEpisodes(params.id)
+  const episodes = await getEpisodes(id)
   const currentEpisodeNumber = searchParams.ep ? Number.parseInt(searchParams.ep) : 1
 
   const currentEpisode = episodes.find((ep) => ep.episode_number === currentEpisodeNumber) || episodes[0]
@@ -134,4 +80,56 @@ export default async function WatchPage({ params, searchParams }: Props) {
     </div>
   )
 }
+
+async function getAnime(id: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase.from("anime").select("*").eq("id", id).single()
+
+  if (error) {
+    console.error("Error fetching anime:", error)
+    return null
+  }
+
+  return data
+}
+
+async function getEpisodes(animeId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("episode")
+    .select("*")
+    .eq("anime_id", animeId)
+    .order("episode_number", { ascending: true })
+
+  if (error) {
+    console.error("Error fetching episodes:", error)
+    return []
+  }
+
+  return data
+}
+
+async function getVideoServers(episodeId: number) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("video_server")
+    .select(`
+      id,
+      server_name,
+      url,
+      is_default,
+      server_id,
+      quality:quality_id(id, name)
+    `)
+    .eq("episode_id", episodeId)
+    .order("is_default", { ascending: false })
+
+  if (error) {
+    console.error("Error fetching video servers:", error)
+    return []
+  }
+
+  return data
+}
+
 
