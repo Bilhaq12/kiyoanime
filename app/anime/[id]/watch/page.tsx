@@ -5,15 +5,9 @@ import EpisodeList from "@/components/episode-list"
 import AnimeInfo from "@/components/anime-info"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface WatchPageProps {
-  params: {
-    id: string
-  }
-  searchParams: {
-    ep?: string
-    server?: string
-    quality?: string
-  }
+type Props = {
+  params: { id: string }
+  searchParams: { ep?: string; server?: string; quality?: string }
 }
 
 async function getAnime(id: string) {
@@ -67,7 +61,7 @@ async function getVideoServers(episodeId: number) {
   return data
 }
 
-export default async function WatchPage({ params, searchParams }: WatchPageProps) {
+export default async function WatchPage({ params, searchParams }: Props) {
   const anime = await getAnime(params.id)
 
   if (!anime) {
