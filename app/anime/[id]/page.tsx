@@ -8,20 +8,93 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate, getAnimeStatusColor } from "@/lib/utils"
 import AnimeCarousel from "@/components/anime-carousel"
 
-// Use any type to bypass type checking
-export default async function AnimePage({ params }: any) {
-  const id = params.id
+interface AnimePageProps {
+  params: {
+    id: string
+  }
+}
 
-  const anime = await getAnime(id)
+async function getAnime(id: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase.from("anime").select("*").eq("id", id).single()
+
+  if (error) {
+    console.error("Error fetching anime:", error)
+    return null
+  }
+
+  return data
+}
+
+async function getEpisodes(animeId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("episode")
+    .select("*")
+    .eq("anime_id", animeId)
+    .order("episode_number", { ascending: true })
+
+  if (error) {
+    console.error("Error fetching episodes:", error)
+    return []
+  }
+
+  return data
+}
+
+async function getGenres(animeId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase.from("anime_genre").select("genre_id, genre(id, name)").eq("anime_id", animeId)
+
+  if (error) {
+    console.error("Error fetching genres:", error)
+    return []
+  }
+
+  return data.map((item) => item.genre)
+}
+
+async function getCharacters(animeId: string) {
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from("anime_character")
+    .select("character_id, character(id, name, image_url, description)")
+    .eq("anime_id", animeId)
+    .limit(6)
+
+  if (error) {
+    console.error("Error fetching characters:", error)
+    return []
+  }
+
+  return data.map((item) => item.character)
+}
+
+async function getSimilarAnime(animeId: string) {
+  const supabase = getSupabase()
+  // In a real app, you'd use genre matching or other recommendation logic
+  // For now, we'll just get random anime
+  const { data, error } = await supabase.from("anime").select("*").neq("id", animeId).limit(10)
+
+  if (error) {
+    console.error("Error fetching similar anime:", error)
+    return []
+  }
+
+  return data
+}
+
+export default async function AnimePage({ params }: AnimePageProps) {
+  const anime = await getAnime(params.id)
 
   if (!anime) {
     notFound()
   }
 
-  const episodes = await getEpisodes(id)
-  const genres = await getGenres(id)
-  const characters = await getCharacters(id)
-  const similarAnime = await getSimilarAnime(id)
+  const episodes = await getEpisodes(params.id)
+  const genres = await getGenres(params.id)
+  const characters = await getCharacters(params.id)
+  const similarAnime = await getSimilarAnime(params.id)
 
   // Update view count
   if (anime) {
@@ -237,75 +310,5 @@ export default async function AnimePage({ params }: any) {
       </div>
     </div>
   )
-}
-
-async function getAnime(id: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase.from("anime").select("*").eq("id", id).single()
-
-  if (error) {
-    console.error("Error fetching anime:", error)
-    return null
-  }
-
-  return data
-}
-
-async function getEpisodes(animeId: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from("episode")
-    .select("*")
-    .eq("anime_id", animeId)
-    .order("episode_number", { ascending: true })
-
-  if (error) {
-    console.error("Error fetching episodes:", error)
-    return []
-  }
-
-  return data
-}
-
-async function getGenres(animeId: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase.from("anime_genre").select("genre_id, genre(id, name)").eq("anime_id", animeId)
-
-  if (error) {
-    console.error("Error fetching genres:", error)
-    return []
-  }
-
-  return data.map((item) => item.genre)
-}
-
-async function getCharacters(animeId: string) {
-  const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from("anime_character")
-    .select("character_id, character(id, name, image_url, description)")
-    .eq("anime_id", animeId)
-    .limit(6)
-
-  if (error) {
-    console.error("Error fetching characters:", error)
-    return []
-  }
-
-  return data.map((item) => item.character)
-}
-
-async function getSimilarAnime(animeId: string) {
-  const supabase = getSupabase()
-  // In a real app, you'd use genre matching or other recommendation logic
-  // For now, we'll just get random anime
-  const { data, error } = await supabase.from("anime").select("*").neq("id", animeId).limit(10)
-
-  if (error) {
-    console.error("Error fetching similar anime:", error)
-    return []
-  }
-
-  return data
 }
 
