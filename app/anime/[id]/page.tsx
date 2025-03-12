@@ -311,3 +311,4 @@ export default async function AnimePage({ params }: AnimePageProps) {
     </div>
   )
 }
+
