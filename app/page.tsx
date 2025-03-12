@@ -92,7 +92,7 @@ async function getCompletedAnime() {
   return data
 }
 
-// Tambahkan pemanggilan fungsi-fungsi baru di dalam fungsi Home
+// Function home
 export default async function Home() {
   const featuredAnime = await getFeaturedAnime()
   const popularAnime = await getPopularAnime()
